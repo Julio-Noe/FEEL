@@ -41,44 +41,34 @@ public class WAT extends EntityExtractor {
 		super.setName("WAT");
 	}
 
-	public static void main(String[] args) throws Exception {
-
-		WAT service = new WAT("https://wat.d4science.org/wat/tag/tag",
-				"23e8a7b9-57f0-4167-8f33-3adab8a485d5-843339462", .01);
-
-		String sentence = "Bryan Lee Cranston is an American actor.  He is known for portraying \"Walter White\" in the drama series Breaking Bad.";
-		
-		sentence ="Bryan Lee Cranston is an American actor";
-		ArrayList<Entity> me = service.getEntities(sentence);
-
-		for (Entity en : me) {
-			System.out.println(" startEnd:"+en.getStart()+","+en.getEnd()+" Mention " + en.getSurfaceText());
-			System.out.println("URI " + en.getURI());
-			System.out.println("confidence " + en.getConfidenceScore());
-
-		}
-
-	}
-
 	@Override
 	public ArrayList<Entity> getEntities(String sentence) {
+		// entities = new ArrayList<>(); // initialize array
 		super.initializeEntities();
 		String response = null;
 		try {
 			response = this.sendPost(sentence);
 		} catch (KeyManagementException | NoSuchAlgorithmException | IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		//System.out.println(response);
 
 		this.readOutput(response); // feed entities array
 		super.removeMentions();
 		return super.getEntities();
 	}
 
-	@SuppressWarnings("deprecation")
+	// this is not a convenient implementation for production
 	public String sendPost(String sentence)
 			throws UnsupportedEncodingException, IOException, NoSuchAlgorithmException, KeyManagementException {
-		
+		/*
+		 * fix for Exception in thread "main" javax.net.ssl.SSLHandshakeException:
+		 * sun.security.validator.ValidatorException: PKIX path building failed:
+		 * sun.security.provider.certpath.SunCertPathBuilderException: unable to find
+		 * valid certification path to requested target
+		 */
 		TrustManager[] trustAllCerts = new TrustManager[] { new X509ExtendedTrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -150,6 +140,22 @@ public class WAT extends EntityExtractor {
 		// add reuqest header
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
+		//con.setRequestProperty("Accept-Language", "en-US,en;q=0.05");
+
+		
+		//System.out.println();
+
+		// Send post request
+//		con.setDoOutput(true);
+//		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+//		wr.writeBytes(urlParameters);
+//		wr.flush();
+//		wr.close();
+
+		// int responseCode = con.getResponseCode();
+		// System.out.println("\nSending 'POST' request to URL : " + url);
+		// System.out.println("Post parameters : " + urlParameters);
+		// System.out.println("Response Code : " + responseCode);
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -184,10 +190,12 @@ public class WAT extends EntityExtractor {
 				tent.setSurfaceText(objc.get("spot").toString());
 				tent.setURI("http://dbpedia.org/resource/" + objc.get("title").toString().replaceAll(" ", "_"));
 				tent.setConfidenceScore(objc.get("rho").toString());
+				// tent.setTypes(objc.get("babelSynsetID").toString());
 				tent.setOffset(Integer.parseInt(objc.get("start").toString()),
 						Integer.parseInt(objc.get("end").toString()));
 
 				super.addEntity(tent);
+				// this.entities.add(tent);
 
 			}
 
@@ -195,6 +203,7 @@ public class WAT extends EntityExtractor {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
+			//Logger.getLogger(InvocationService.class.getName()).warn("Null pointer tagme " + text);
 		}
 
 	}

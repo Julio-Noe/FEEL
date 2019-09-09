@@ -7,8 +7,8 @@ import com.cinvestav.Entity;
 
 public abstract class EntityExtractor {
 	private String USER_AGENT = "Mozilla/5.0";
-	private String serviceURL = "http://babelfy.io/v1/disambiguate";
-	private String tokenKey = "10564323-95d6-4d00-8043-2a19a76b0a0e";
+	private String serviceURL = "";
+	private String tokenKey = "";
 	private ArrayList<Entity> entities = null;
 	private boolean keepMentions = false;
 	private int priority = 0;
@@ -109,7 +109,7 @@ public abstract class EntityExtractor {
 			while (enit.hasNext()) {
 				Entity ent = enit.next();
 
-				if (ent.getURI().compareTo("") == 0 || Double.parseDouble(ent.getConfidenceScore()) < this.confidence) {
+				if (ent.getURI().compareTo("") == 0 | Double.parseDouble(ent.getConfidenceScore()) <= this.confidence) {
 					enit.remove();
 				}
 			}

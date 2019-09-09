@@ -17,8 +17,10 @@ public class Entity implements Serializable{
 	private String source = ""; // extraction tool e.g. spotlight, tagme
 	private String URI; // identifier
 	private String confidenceScore = ""; // degree of confidence
+	private String types = ""; //
 	private int start = 0;
 	private int end = 0;
+//	private String offsetKey="";
 
 	public Entity() {
 	}
@@ -125,7 +127,20 @@ public class Entity implements Serializable{
 		this.confidenceScore = confidenceScore;
 	}
 
-	
+	/**
+	 * @return the types
+	 */
+	public String getTypes() {
+		return types;
+	}
+
+	/**
+	 * @param types
+	 *            the types to set
+	 */
+	public void setTypes(String types) {
+		this.types = types;
+	}
 
 	public int getStart() {
 		return start;

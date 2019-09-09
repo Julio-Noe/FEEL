@@ -38,35 +38,12 @@ public class Babelfy extends EntityExtractor {
 		super.setName("Babelfy");
 	}
 
-	public static void main(String[] args) throws Exception {
-
-		EntityExtractor babelService = new Babelfy();
-
-		babelService.setServiceURL("http://babelfy.io/v1/disambiguate");
-		// babelService.setTokenKey("10564323-95d6-4d00-8043-2a19a76b0a0e");
-
-		babelService.setTokenKey("dc41cd14-12b7-45d9-9b5b-2b51e9394864");
-
-		String text = "Bryan Lee Cranston is an American actor.  He is known for portraying \"Walter White\" in the drama series Breaking Bad.";
-
-		//text="New York city is located in USA";
-		ArrayList<Entity> me = babelService.getEntities(text);
-
-		for (Entity en : me) {
-			System.out.println("Mention " + en.getSurfaceText());
-			System.out.println("start: " + en.getStart() + ", End:" + en.getEnd());
-			System.out.println("URI " + en.getURI());
-		}
-
-	}
-
 	@Override
 	public ArrayList<Entity> getEntities(String sentence) {
 		// entities = new ArrayList<>(); // initialize array
 		super.initializeEntities();
 		String response = this.sendPost(sentence);
 
-//		System.out.println(response);
 
 		this.readOutput("{\"concepts\":" + response + "}", sentence); // feed entities array
 		super.removeMentions();
@@ -93,7 +70,13 @@ public class Babelfy extends EntityExtractor {
 		formparams.add(new BasicNameValuePair("MCS", "ON_WITH_STOPWORDS"));
 		formparams.add(new BasicNameValuePair("annRes", "BN"));
 		formparams.add(new BasicNameValuePair("cands", "TOP"));
-		formparams.add(new BasicNameValuePair("annType", "NAMED_ENTITIES"));
+		//formparams.add(new BasicNameValuePair("annType", "NAMED_ENTITIES"));
+		// For more parameters
+		// http://babelfy.org/guide
+		// formparams.add(new BasicNameValuePair("th", "0.9"));
+		//formparams.add(new BasicNameValuePair("annType", "NAMED_ENTITIES"));
+		// formparams.add(new BasicNameValuePair("annType", "ALL"));
+		// formparams.add(new BasicNameValuePair("match", "EXACT_MATCHING"));
 
 		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
 
@@ -140,6 +123,7 @@ public class Babelfy extends EntityExtractor {
 				tent.setSurfaceText(textEntity);
 				tent.setURI(objc.get("DBpediaURL").toString());
 				tent.setConfidenceScore(objc.get("coherenceScore").toString());
+				tent.setTypes(objc.get("babelSynsetID").toString());
 
 				tent.setOffset(tokenStart - 1, tokenEnd);
 
